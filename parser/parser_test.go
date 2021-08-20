@@ -51,7 +51,7 @@ func TestString(t *testing.T) {
 			want: `return x;`,
 		},
 		{
-			name: "",
+			name: "let x = 5;",
 			program: &ast.Program{
 				Statements: []ast.Statement{
 					&ast.LetStatement{
@@ -70,7 +70,7 @@ func TestString(t *testing.T) {
 			want: `let x = 5;`,
 		},
 		{
-			name: "",
+			name: "-5",
 			program: &ast.Program{
 				Statements: []ast.Statement{
 					&ast.ExpressionStatement{
@@ -89,7 +89,7 @@ func TestString(t *testing.T) {
 			want: "(-5)",
 		},
 		{
-			name: "",
+			name: "!x",
 			program: &ast.Program{
 				Statements: []ast.Statement{
 					&ast.ExpressionStatement{
@@ -108,7 +108,7 @@ func TestString(t *testing.T) {
 			want: "(!x)",
 		},
 		{
-			name: "",
+			name: "5 + 5",
 			program: &ast.Program{
 				Statements: []ast.Statement{
 					&ast.ExpressionStatement{
@@ -129,6 +129,67 @@ func TestString(t *testing.T) {
 				},
 			},
 			want: "(5 + 5)",
+		},
+		{
+			name: "a + b / c",
+			program: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.IDENT, Literal: "a"},
+						Expression: &ast.Infix{
+							Token:    token.Token{Type: token.IDENT, Literal: "5"},
+							Operator: "+",
+							Left: &ast.Identifier{
+								Token: token.Token{Type: token.INT, Literal: "a"},
+								Value: "a",
+							},
+							Right: &ast.Infix{
+								Token:    token.Token{Type: token.IDENT, Literal: "b"},
+								Operator: "/",
+								Left: &ast.Identifier{
+									Token: token.Token{Type: token.IDENT, Literal: "b"},
+									Value: "b",
+								},
+								Right: &ast.Identifier{
+									Token: token.Token{Type: token.IDENT, Literal: "c"},
+									Value: "c",
+								},
+							},
+						},
+					},
+				},
+			},
+			want: "(a + (b / c))",
+		},
+		{
+			name: "",
+			program: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.TRUE, Literal: "true"},
+						Expression: &ast.Boolean{
+							Token: token.Token{Type: token.TRUE, Literal: "true"},
+							Value: true,
+						},
+					},
+				},
+			},
+			want: "true",
+		},
+		{
+			name: "",
+			program: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.FALSE, Literal: "false"},
+						Expression: &ast.Boolean{
+							Token: token.Token{Type: token.FALSE, Literal: "false"},
+							Value: false,
+						},
+					},
+				},
+			},
+			want: "false",
 		},
 	}
 
@@ -328,6 +389,47 @@ func TestIntegerExpression(t *testing.T) {
 						Expression: &ast.Integer{
 							Token: token.Token{Type: token.INT, Literal: "5"},
 							Value: 5,
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			lxr := lexer.New(tc.sourceCode)
+			psr := New(lxr)
+			got := psr.ParseProgram()
+			if tc.wantErr {
+				assert.NotEmpty(t, psr.GetErrors())
+			}
+			if !tc.wantErr {
+				assert.Empty(t, psr.GetErrors())
+			}
+			assert.EqualValues(t, tc.want, got)
+		})
+	}
+}
+
+func TestBooleanExpression(t *testing.T) {
+	tt := []struct {
+		name       string
+		sourceCode string
+		want       *ast.Program
+		wantErr    bool
+	}{
+		{
+			name:       "",
+			sourceCode: "true;",
+			want: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.TRUE, Literal: "true"},
+						Expression: &ast.Boolean{
+							Token: token.Token{Type: token.TRUE, Literal: "true"},
+							Value: true,
 						},
 					},
 				},
