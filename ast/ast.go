@@ -178,7 +178,7 @@ func (p *Prefix) String() string {
 
 type Infix struct {
 	// token.PLUS, token.MINUS, token.ASTERISK, token.SLASH,
-	// token.LT, token.GT, token.EQ, token.NOT_EQa
+	// token.LT, token.GT, token.EQ, token.NOT_EQ
 	Token    token.Token
 	Operator string
 	Left     Expression
@@ -202,4 +202,21 @@ func (i *Infix) String() string {
 	out.WriteString(i.Right.String())
 	out.WriteString(")")
 	return out.String()
+}
+
+type Boolean struct {
+	// token.TRUE, token.FALSE
+	Token token.Token
+	Value bool
+}
+
+func (b *Boolean) expressionNode() {
+}
+
+func (b *Boolean) TokenLiteral() string {
+	return b.Token.Literal
+}
+
+func (b *Boolean) String() string {
+	return b.Token.Literal
 }
