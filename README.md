@@ -3,8 +3,8 @@ The Uni programming language is a simple programming language for educational pu
 ## How to install
 In order to build it from the source code, you need `git`, and `go` version 1.19 or later. Run the following commands to build from the source code:
 ```sh
-git clone git@github.com:parsaakbari1209/university.git
-cd university/interpreter
+git clone git@github.com:parsaakbari1209/interpreter.git
+cd interpreter
 go build -o uni
 ```
 ---
